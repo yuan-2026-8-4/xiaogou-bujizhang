@@ -1,0 +1,25 @@
+# 依赖
+node_modules
+
+# 构建产物
+dist
+dist-ssr
+android/app/build
+android/.gradle
+android/local.properties
+
+# 本地环境变量（含密钥，绝不提交）
+.env
+.env.local
+.env.*.local
+
+# APK 反编译分析目录（参考素材，不提交仓库）
+apk-analysis
+
+# 日志与临时文件
+*.log
+.DS_Store
+*.apk
+*.apk.1
+*.tmp
+*.bak
