@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#F4EFE6" />
+<meta name="format-detection" content="telephone=no" />
+<title>小狗不记账 · 选择你要做的事</title>
+<style>
+  :root{
+    --ink:#241F1C; --ink-2:#3B322B; --copper:#B0764C; --copper-deep:#8A5434;
+    --paper:#F4EFE6; --card:#FFFFFF; --sub:#8E7C68; --line:#EDE5D8; --soft:#FAF6EF;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;padding:0}
+  body{
+    min-height:100vh;background:var(--paper);color:var(--ink-2);
+    font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Noto Sans SC","Helvetica Neue",Arial,sans-serif;
+    display:flex;flex-direction:column;align-items:center;
+    padding:20px 18px calc(24px + env(safe-area-inset-bottom));
+    -webkit-font-smoothing:antialiased;
+  }
+  /* 顶部品牌 */
+  .brand{display:flex;align-items:center;gap:8px;margin:6px 0 18px;color:var(--ink);animation:fade .34s ease both}
+  .brand .dot{width:22px;height:22px;border-radius:7px;background:var(--ink);position:relative;flex:0 0 auto}
+  .brand .dot::after{content:"";position:absolute;width:7px;height:7px;border-radius:50%;background:var(--copper);right:4px;top:4px}
+  .brand b{font-size:15px;letter-spacing:.08em}
+
+  .card{
+    width:100%;max-width:440px;background:var(--card);border-radius:26px;
+    box-shadow:0 14px 38px rgba(48,36,26,.10);padding:20px 18px 20px;
+    animation:rise .42s cubic-bezier(.22,1,.36,1) both;
+  }
+  /* 主视觉 */
+  .hero{
+    background:var(--ink);border-radius:20px;padding:22px 20px 24px;color:#fff;position:relative;overflow:hidden;
+  }
+  .hero::after{
+    content:"";position:absolute;right:-46px;top:-52px;width:168px;height:168px;border-radius:50%;
+    background:radial-gradient(circle at 35% 35%,rgba(203,150,102,.34),rgba(203,150,102,0) 70%);
+  }
+  .hero .tag{font-size:11px;letter-spacing:.2em;color:#D8A87E;margin-bottom:10px}
+  .hero h1{margin:0 0 8px;font-size:22px;line-height:1.38;font-weight:650;letter-spacing:.01em}
+  .hero p{margin:0;font-size:13px;line-height:1.7;color:#BDB0A4}
+  .codechip{
+    display:inline-flex;align-items:center;gap:8px;margin-top:16px;
+    background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);
+    border-radius:999px;padding:7px 14px;font-size:12.5px;color:#F0E4D6;
+  }
+  .codechip[hidden]{display:none}
+  .codechip b{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.14em;color:#E7B98C;font-size:14px}
+
+  /* 功能选项 */
+  .opts{margin-top:16px;display:flex;flex-direction:column;gap:10px}
+  .opt{
+    width:100%;display:flex;align-items:center;gap:13px;text-align:left;font-family:inherit;
+    background:var(--card);border:1px solid var(--line);border-radius:18px;
+    padding:14px 14px;min-height:68px;cursor:pointer;color:inherit;
+    transition:transform .16s ease,box-shadow .2s ease,border-color .2s ease,background .2s ease;
+    touch-action:manipulation;position:relative;overflow:hidden;
+  }
+  .opt:active{transform:scale(.982);background:var(--soft);border-color:#DCCDB7;box-shadow:0 2px 8px rgba(48,36,26,.06)}
+  .opt .ico{
+    flex:0 0 42px;width:42px;height:42px;border-radius:13px;display:flex;align-items:center;justify-content:center;
+    background:#F6EADF;color:var(--copper-deep);
+  }
+  .opt .tx{flex:1 1 auto;min-width:0}
+  .opt .tt{display:block;font-size:16px;font-weight:650;color:var(--ink);line-height:1.35}
+  .opt .ds{display:block;margin-top:3px;font-size:12.5px;color:var(--sub);line-height:1.45}
+  .opt .go{flex:0 0 auto;color:#C8B7A4;font-size:19px;line-height:1;transition:transform .2s ease}
+  .opt:active .go{transform:translateX(2px)}
+  .opt.primary{border-color:#E3D3BF;background:linear-gradient(180deg,#FFFDF9,#FBF4EA)}
+  .opt.primary .ico{background:var(--ink);color:#E7B98C}
+
+  .tip{margin:14px 2px 0;font-size:12px;line-height:1.7;color:var(--sub);text-align:center}
+  .steps{margin:16px 0 0;padding:0;list-style:none;border-top:1px solid var(--line)}
+  .steps li{display:flex;gap:10px;padding:11px 0;border-bottom:1px solid var(--line);font-size:12.5px;line-height:1.6;color:var(--sub)}
+  .steps li:last-child{border-bottom:0;padding-bottom:0}
+  .steps .n{
+    flex:0 0 20px;height:20px;border-radius:50%;background:var(--soft);color:var(--copper-deep);
+    font-size:11px;display:flex;align-items:center;justify-content:center;margin-top:1px;font-weight:600
+  }
+  .footer{margin:18px 0 0;font-size:11px;color:#B0A08C;text-align:center;line-height:1.8}
+
+  /* 底部面板 */
+  .scrim{
+    position:fixed;inset:0;background:rgba(28,22,18,.42);opacity:0;pointer-events:none;
+    transition:opacity .26s ease;z-index:80;-webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px)
+  }
+  .scrim.show{opacity:1;pointer-events:auto}
+  .sheet{
+    position:fixed;left:0;right:0;bottom:0;z-index:90;background:var(--card);
+    border-radius:24px 24px 0 0;box-shadow:0 -10px 40px rgba(28,22,18,.18);
+    padding:8px 18px calc(20px + env(safe-area-inset-bottom));
+    transform:translateY(102%);transition:transform .32s cubic-bezier(.22,1,.36,1);
+    max-height:86vh;display:flex;flex-direction:column;
+  }
+  .sheet.show{transform:translateY(0)}
+  .sheet .bar{width:38px;height:4px;border-radius:2px;background:#E4D9C9;margin:6px auto 4px;flex:0 0 auto}
+  .sheet .hd{display:flex;align-items:center;justify-content:space-between;padding:6px 2px 12px;flex:0 0 auto}
+  .sheet .hd h2{margin:0;font-size:17px;font-weight:650;color:var(--ink)}
+  .sheet .hd .x{
+    width:32px;height:32px;border-radius:50%;border:1px solid var(--line);background:var(--soft);
+    color:var(--sub);font-size:16px;line-height:1;display:flex;align-items:center;justify-content:center;cursor:pointer;font-family:inherit
+  }
+  .sheet .bd{overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:4px}
+  .flist{display:flex;flex-direction:column;gap:10px}
+  .fitem{display:flex;gap:12px;padding:12px 2px;align-items:flex-start}
+  .fitem .ico{
+    flex:0 0 38px;width:38px;height:38px;border-radius:12px;background:var(--soft);color:var(--copper-deep);
+    display:flex;align-items:center;justify-content:center
+  }
+  .fitem .tt{display:block;font-size:14.5px;font-weight:650;color:var(--ink)}
+  .fitem .ds{display:block;margin-top:3px;font-size:12.5px;color:var(--sub);line-height:1.6}
+  .invite-code{
+    text-align:center;background:var(--soft);border:1px solid var(--line);border-radius:16px;padding:16px 12px
+  }
+  .invite-code .lb{font-size:12px;color:var(--sub);letter-spacing:.1em}
+  .invite-code .cd{margin:8px 0 0;font-size:30px;font-weight:700;letter-spacing:.18em;color:var(--ink);font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+  .invite-code .lg{margin-top:6px;font-size:12px;color:var(--sub)}
+  .btn{
+    display:block;width:100%;border:0;border-radius:14px;padding:15px 16px;font-size:15px;font-weight:650;
+    text-align:center;text-decoration:none;cursor:pointer;font-family:inherit;transition:transform .15s ease,opacity .18s ease
+  }
+  .btn:active{transform:scale(.985)}
+  .btn-primary{background:var(--ink);color:#fff}
+  .btn-ghost{background:var(--soft);color:var(--ink-2);border:1px solid var(--line)}
+
+  /* 微信引导 */
+  .mask{
+    position:fixed;inset:0;background:rgba(24,19,16,.9);color:#fff;z-index:120;
+    display:none;flex-direction:column;align-items:flex-end;justify-content:flex-start;
+    padding:18px 20px;text-align:right;
+  }
+  .mask.show{display:flex}
+  .mask .arrow{font-size:34px;line-height:1;color:#D8A87E;margin-right:6px}
+  .mask h2{font-size:17px;margin:10px 0 8px;font-weight:600}
+  .mask p{font-size:13px;line-height:1.8;color:#D7CFC6;margin:0 0 16px;max-width:300px}
+  .mask button{
+    background:#D8A87E;color:#241F1C;border:0;border-radius:10px;padding:11px 16px;font-size:13px;font-weight:650;font-family:inherit
+  }
+  .toast{
+    position:fixed;left:50%;bottom:44px;transform:translateX(-50%) translateY(16px);
+    background:rgba(36,31,28,.94);color:#fff;font-size:13px;padding:11px 17px;border-radius:12px;
+    opacity:0;transition:opacity .24s ease,transform .24s ease;pointer-events:none;z-index:140;max-width:80vw;text-align:center
+  }
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+  @keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+  @keyframes fade{from{opacity:0}to{opacity:1}}
+  @media (prefers-reduced-motion:reduce){
+    *{animation-duration:.001s!important;transition-duration:.001s!important}
+  }
+  @media (min-width:600px){
+    body{padding-top:38px}
+    .hero h1{font-size:24px}
+    .sheet{max-width:520px;margin:0 auto;border-radius:24px 24px 0 0}
+  }
+</style>
+</head>
+<body>
+
+<div class="brand"><span class="dot"></span><b>小狗不记账</b></div>
+
+<main class="card">
+  <section class="hero">
+    <div class="tag">SCAN OK</div>
+    <h1>扫码成功，你想先做点什么？</h1>
+    <p>选一个入口，30 秒开始记录每一笔。<br/>这本账可以一个人记，也可以一家人一起记。</p>
+    <div class="codechip" id="codeChip" hidden>邀请码 <b id="chipCode">——</b></div>
+  </section>
+
+  <nav class="opts" aria-label="功能选择">
+    <button class="opt primary" data-act="download" aria-label="下载安卓安装包">
+      <span class="ico" aria-hidden="true">
+        <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v11"/><path d="m7.5 10 4.5 4.5L16.5 10"/><path d="M4.5 18.5h15"/></svg>
+      </span>
+      <span class="tx">
+        <span class="tt">下载安卓安装包</span>
+        <span class="ds" id="dlDesc">v2.6.2 正式版 · 约 14 MB · 安装即用</span>
+      </span>
+      <span class="go" aria-hidden="true">›</span>
+    </button>
+
+    <button class="opt" data-act="open" aria-label="打开小狗不记账">
+      <span class="ico" aria-hidden="true">
+        <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="2.5" width="12" height="19" rx="3"/><path d="M10.5 18.5h3"/></svg>
+      </span>
+      <span class="tx">
+        <span class="tt">打开小狗不记账</span>
+        <span class="ds">已安装可直接进入，未安装会自动引导下载</span>
+      </span>
+      <span class="go" aria-hidden="true">›</span>
+    </button>
+
+    <button class="opt" data-act="features" aria-label="查看功能介绍">
+      <span class="ico" aria-hidden="true">
+        <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5.5h16"/><path d="M4 12h16"/><path d="M4 18.5h10"/></svg>
+      </span>
+      <span class="tx">
+        <span class="tt">功能介绍 / 玩法</span>
+        <span class="ds">多人协同、语音记账、小票识别、预算报表</span>
+      </span>
+      <span class="go" aria-hidden="true">›</span>
+    </button>
+
+    <button class="opt" data-act="invite" aria-label="查看邀请码与会员规则">
+      <span class="ico" aria-hidden="true">
+        <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="15" rx="3"/><path d="m3.5 7 8.5 6 8.5-6"/></svg>
+      </span>
+      <span class="tx">
+        <span class="tt">邀请码 / 领会员</span>
+        <span class="ds">注册即得 7 天会员，邀请好友还能升级卡型</span>
+      </span>
+      <span class="go" aria-hidden="true">›</span>
+    </button>
+  </nav>
+
+  <p class="tip" id="tipText">微信内请点右上角「···」→「在浏览器打开」后再下载安装。</p>
+
+  <ol class="steps">
+    <li><span class="n">1</span>下载并安装「小狗不记账」</li>
+    <li><span class="n">2</span>注册 / 登录，开始记第一笔</li>
+    <li><span class="n">3</span>有邀请码就在「我的 → 邀请好友」里填写</li>
+  </ol>
+
+  <p class="footer">四川杰曜昱安品牌管理有限公司<br/>小狗不记账 · 把每一笔都记清楚</p>
+</main>
+
+<div class="scrim" id="scrim"></div>
+
+<section class="sheet" id="sheetFeatures" role="dialog" aria-modal="true" aria-labelledby="ftTitle">
+  <div class="bar"></div>
+  <div class="hd"><h2 id="ftTitle">功能介绍</h2><button class="x" data-close aria-label="关闭">✕</button></div>
+  <div class="bd">
+    <div class="flist">
+      <div class="fitem">
+        <span class="ico" aria-hidden="true"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 19c.6-3 2.8-4.6 5.5-4.6S14 16 14.6 19"/><circle cx="17" cy="9.5" r="2.6"/><path d="M15.4 19c.3-2.4 1.6-3.8 3.4-3.8 1 0 1.8.4 2.4 1.2"/></svg></span>
+        <span><span class="tt">多人协同记账</span><span class="ds">一个账本，家人 / 室友同时记，云端实时同步，谁记的都有头像标记。</span></span>
+      </div>
+      <div class="fitem">
+        <span class="ico" aria-hidden="true"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0"/><path d="M12 18v3"/></svg></span>
+        <span><span class="tt">一句话记账</span><span class="ds">说一句「早餐十块」，自动识别金额和分类直接入账。</span></span>
+      </div>
+      <div class="fitem">
+        <span class="ico" aria-hidden="true"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 4.5h15v15h-15z"/><path d="M8 9h8"/><path d="M8 12.5h8"/><path d="M8 16h5"/></svg></span>
+        <span><span class="tt">小票拍照识别</span><span class="ds">拍张照自动读出合计金额，小数、千分位都能正确识别，可再手动改。</span></span>
+      </div>
+      <div class="fitem">
+        <span class="ico" aria-hidden="true"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V5"/><path d="M4 19h16"/><path d="M7.5 16v-4"/><path d="M12 16V8.5"/><path d="M16.5 16v-6"/></svg></span>
+        <span><span class="tt">预算与报表</span><span class="ds">月度预算进度、近 6 个月趋势、分类占比，还能一键导出备份。</span></span>
+      </div>
+    </div>
+    <button class="btn btn-primary" style="margin-top:14px" data-act="download">下载安卓安装包体验</button>
+  </div>
+</section>
+
+<section class="sheet" id="sheetInvite" role="dialog" aria-modal="true" aria-labelledby="ivTitle">
+  <div class="bar"></div>
+  <div class="hd"><h2 id="ivTitle">邀请码 / 领会员</h2><button class="x" data-close aria-label="关闭">✕</button></div>
+  <div class="bd">
+    <div class="invite-code">
+      <div class="lb">你的邀请码</div>
+      <div class="cd" id="ivCode">——</div>
+      <div class="lg" id="ivLedger"></div>
+    </div>
+    <button class="btn btn-ghost" style="margin-top:12px" id="btnCopyInvite">复制邀请码</button>
+    <ol class="steps" style="margin-top:14px">
+      <li><span class="n">1</span>下载并安装「小狗不记账」</li>
+      <li><span class="n">2</span>注册 / 登录后在「我的 → 邀请好友」输入邀请码</li>
+      <li><span class="n">3</span>被邀请人注册即得 7 天会员，立即生效</li>
+      <li><span class="n">4</span>邀请人：第 1 / 3 / 5 / 10 位好友分别得月卡 / 半年卡 / 年卡 / 永久卡</li>
+    </ol>
+    <p class="tip" id="ivTip">没有邀请码也能先下载体验，之后随时在 App 里绑定。</p>
+    <button class="btn btn-primary" style="margin-top:12px" data-act="download">先去下载安装包</button>
+  </div>
+</section>
+
+<div class="mask" id="wxMask">
+  <div class="arrow">↗</div>
+  <h2>请在浏览器中打开</h2>
+  <p>微信内无法直接打开 App 或下载安装包。点击右上角「···」，选择「在浏览器打开」。</p>
+  <button id="btnCopyLink2">先复制本页链接</button>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ===== 可配置项（发版时由 deploy-invite.mjs 自动写入 APP_VERSION） ===== */
+  var APP_VERSION = "2.6.2";
+  var APK_BASE = "https://yuan-2026-8-4.github.io/xiaogou-bujizhang/apk/";
+  var APK_URL = APK_BASE + "xiaogou-v" + APP_VERSION + ".apk";
+  var APP_SCHEME = "xiaogou"; // xiaogou://invite?code=XXXX
+  var DOWNLOAD_NAME = "小狗不记账-v" + APP_VERSION + ".apk";
+
+  /* ===== 参数（保持原有扫码参数逻辑不变） ===== */
+  var params = new URLSearchParams(location.search);
+  var code = (params.get("code") || "").trim().toUpperCase().slice(0, 12);
+  var ledger = (params.get("ledger") || "").trim();
+  var isWechat = /MicroMessenger/i.test(navigator.userAgent);
+  var isAndroid = /Android/i.test(navigator.userAgent);
+
+  var $ = function (id) { return document.getElementById(id); };
+
+  function toast(msg) {
+    var el = $("toast");
+    el.textContent = msg;
+    el.classList.add("show");
+    clearTimeout(el._t);
+    el._t = setTimeout(function () { el.classList.remove("show"); }, 1900);
+  }
+
+  /* ===== 面板交互 ===== */
+  var scrim = $("scrim");
+  var sheets = { features: $("sheetFeatures"), invite: $("sheetInvite") };
+
+  function openSheet(key) {
+    var el = sheets[key];
+    if (!el) return;
+    scrim.classList.add("show");
+    el.classList.add("show");
+    document.body.style.overflow = "hidden";
+  }
+  function closeSheets() {
+    scrim.classList.remove("show");
+    sheets.features.classList.remove("show");
+    sheets.invite.classList.remove("show");
+    document.body.style.overflow = "";
+  }
+  scrim.addEventListener("click", closeSheets);
+  Array.prototype.forEach.call(document.querySelectorAll("[data-close]"), function (b) {
+    b.addEventListener("click", closeSheets);
+  });
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape") closeSheets(); });
+
+  /* ===== 下载（逻辑与原来一致：直链交给系统下载器） ===== */
+  function downloadUrl() {
+    var q = [];
+    if (code) { q.push("from=invite", "code=" + encodeURIComponent(code)); }
+    else { q.push("from=scan"); }
+    return APK_URL + (APK_URL.indexOf("?") >= 0 ? "&" : "?") + q.join("&");
+  }
+  function doDownload() {
+    if (isWechat) { $("wxMask").classList.add("show"); return; }
+    toast("开始下载：" + DOWNLOAD_NAME);
+    window.location.href = downloadUrl();
+  }
+
+  /* ===== 打开 App（深链唤起，超时降级下载） ===== */
+  function doOpen() {
+    if (isWechat) { $("wxMask").classList.add("show"); return; }
+    if (!isAndroid) { toast("当前设备暂只支持安卓，已为你打开下载"); doDownload(); return; }
+    toast("正在打开小狗不记账…");
+    var deep = APP_SCHEME + "://invite" + (code ? "?code=" + encodeURIComponent(code) : "");
+    var start = Date.now();
+    var timer = setTimeout(function () {
+      if (Date.now() - start < 2600 && !document.hidden) {
+        toast("未检测到 App，正在为你下载安装包");
+        window.location.href = downloadUrl();
+      }
+    }, 1700);
+    document.addEventListener("visibilitychange", function onVis() {
+      if (document.hidden) { clearTimeout(timer); document.removeEventListener("visibilitychange", onVis); }
+    });
+    window.location.href = deep;
+  }
+
+  /* ===== 复制 ===== */
+  function fallbackCopy(text) {
+    var ta = document.createElement("textarea");
+    ta.value = text;
+    ta.setAttribute("readonly", "");
+    ta.style.position = "fixed";
+    ta.style.opacity = "0";
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand("copy"); } catch (e) {}
+    document.body.removeChild(ta);
+  }
+  function copy(text, okMsg) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function () { toast(okMsg); }, function () { fallbackCopy(text); toast(okMsg); });
+    } else {
+      fallbackCopy(text); toast(okMsg);
+    }
+  }
+
+  /* ===== 渲染扫码参数 ===== */
+  $("dlDesc").textContent = "v" + APP_VERSION + " 正式版 · 约 14 MB · 安装即用";
+  if (code) {
+    $("codeChip").hidden = false;
+    $("chipCode").textContent = code;
+    $("ivCode").textContent = code;
+    if (ledger) $("ivLedger").textContent = "账本：" + ledger;
+  } else {
+    $("ivCode").textContent = "无邀请码";
+    $("ivTip").textContent = "本页没有携带邀请码；如好友分享了邀请码，注册后在「我的 → 邀请好友」里填写即可。";
+  }
+
+  /* ===== 选项点击 ===== */
+  Array.prototype.forEach.call(document.querySelectorAll(".opt"), function (btn) {
+    btn.addEventListener("click", function () {
+      var act = btn.getAttribute("data-act");
+      if (act === "download") { doDownload(); }
+      else if (act === "open") { doOpen(); }
+      else if (act === "features") { openSheet("features"); }
+      else if (act === "invite") { openSheet("invite"); }
+    });
+  });
+  Array.prototype.forEach.call(document.querySelectorAll("[data-act='download']:not(.opt)"), function (btn) {
+    btn.addEventListener("click", function () { closeSheets(); setTimeout(doDownload, 220); });
+  });
+
+  $("btnCopyInvite").addEventListener("click", function () {
+    if (!code) { toast("本页没有邀请码"); return; }
+    copy(code, "邀请码已复制：" + code);
+  });
+
+  /* ===== 微信内提示 ===== */
+  if (isWechat) {
+    $("tipText").textContent = "微信内请点右上角「···」→「在浏览器打开」后再下载或打开 App。";
+  }
+  $("btnCopyLink2").addEventListener("click", function () {
+    copy(location.href, "链接已复制，去浏览器粘贴打开");
+    $("wxMask").classList.remove("show");
+  });
+  $("wxMask").addEventListener("click", function (e) {
+    if (e.target === $("wxMask")) $("wxMask").classList.remove("show");
+  });
+})();
+</script>
+</body>
+</html>
