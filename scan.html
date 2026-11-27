@@ -179,7 +179,7 @@
         <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v11"/><path d="m7.5 10 4.5 4.5L16.5 10"/><path d="M4.5 18.5h15"/></svg>
       </span>
       <span class="tx">
-        <span class="tt">下载安卓安装包</span>
+        <span class="tt" id="dlTitle">下载安卓安装包</span>
         <span class="ds" id="dlDesc">v2.7.0 正式版 · 约 17 MB · 安装即用</span>
       </span>
       <span class="go" aria-hidden="true">›</span>
@@ -254,7 +254,7 @@
         <span><span class="tt">预算与报表</span><span class="ds">月度预算进度、近 6 个月趋势、分类占比，还能一键导出备份。</span></span>
       </div>
     </div>
-    <button class="btn btn-primary" style="margin-top:14px" data-act="download">下载安卓安装包体验</button>
+    <button class="btn btn-primary" style="margin-top:14px" data-act="download" id="btnDlFeature">下载安卓安装包体验</button>
   </div>
 </section>
 
@@ -275,7 +275,7 @@
       <li><span class="n">4</span>邀请人：第 1 / 3 / 5 / 10 位好友分别得月卡 / 半年卡 / 年卡 / 永久卡</li>
     </ol>
     <p class="tip" id="ivTip">没有邀请码也能先下载体验，之后随时在 App 里绑定。</p>
-    <button class="btn btn-primary" style="margin-top:12px" data-act="download">先去下载安装包</button>
+    <button class="btn btn-primary" style="margin-top:12px" data-act="download" id="btnDlInvite">先去下载安装包</button>
   </div>
 </section>
 
@@ -392,7 +392,12 @@
   }
 
   /* ===== 渲染扫码参数 ===== */
-  $("dlDesc").textContent = "v" + APP_VERSION + " 正式版 · 约 17 MB · 安装即用";
+  $("dlTitle").textContent = "下载安卓安装包 v" + APP_VERSION;
+  $("dlDesc").textContent = "版本 v" + APP_VERSION + " · 正式版 · 约 17 MB · 安装即用";
+  var btnFeature = $("btnDlFeature");
+  if (btnFeature) btnFeature.textContent = "下载安卓安装包 v" + APP_VERSION;
+  var btnInvite = $("btnDlInvite");
+  if (btnInvite) btnInvite.textContent = "先去下载 v" + APP_VERSION;
   if (code) {
     $("codeChip").hidden = false;
     $("chipCode").textContent = code;
